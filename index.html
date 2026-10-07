@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sleight of Mind</title>
-<meta name="description" content="An AI capability-elicitation eval, starting with chess. Can a king pass as a pawn?">
+<meta name="description" content="An AI capability-elicitation eval, starting with chess. Can a language model play down to a chosen skill level convincingly?">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312090d'/%3E%3Cpath d='M10 46L7 20l14 10 11-18 11 18 14-10-3 26z' fill='%23d9b25a'/%3E%3Crect x='10' y='48' width='44' height='6' rx='2' fill='%23d9b25a'/%3E%3C/svg%3E">
 <meta property="og:title" content="Sleight of Mind">
-<meta property="og:description" content="An AI capability-elicitation eval, starting with chess. Can a king pass as a pawn?">
+<meta property="og:description" content="An AI capability-elicitation eval, starting with chess. Can a language model play down to a chosen skill level convincingly?">
 <meta name="theme-color" content="#12090d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -438,7 +438,8 @@ footer .checks{margin-bottom:18px;opacity:.5;height:8px;background-size:16px 16p
     <div style="margin-top:40px">
       <details><summary>Why chess?</summary><p>It has a perfect referee. Stockfish scores any move, and real human games at known ratings give a baseline.</p></details>
       <details><summary>Is this proof a model can hide its ability?</summary><p>No. One small model, one prompt, a partial run. It is a pilot to decide whether the full study is worth running.</p></details>
-      <details><summary>Fine print</summary><p>117 positions, one model, one prompt. Lichess ratings are not the same scale as other federations. Replies that were not legal moves are counted separately. Prior work is cited only after it is checked.</p></details>
+      <details><summary>Fine print</summary><p>117 positions, one model, one prompt. Lichess ratings are not the same scale as other federations. Replies that were not legal moves are counted separately.</p></details>
+      <details><summary>Prior work</summary><p>Maia-2 (Jiang et al., arXiv 2409.20553) is the human-move model used here directly, not just cited. The sandbagging framing follows van der Weij et al., "AI Sandbagging" (arXiv 2406.07358, ICLR 2025, read in full): models can be prompted to hit a target score or emulate a weaker model's profile, shown on multiple-choice benchmarks, not chess. Checked at the abstract level, not read in full: LLM CHESS (arXiv 2512.01992) and ChessArena (arXiv 2509.24239) test raw strength, not prompted ratings; UniMaia (arXiv 2605.27767) steers strength on an older trained network, not a current LLM. No study found of current LLMs prompted to play chess at a target human rating on request.</p></details>
     </div>
   </div>
 </section>
