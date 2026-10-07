@@ -96,6 +96,10 @@ h2.h{font-family:var(--disp);font-weight:700;font-size:clamp(38px,7vw,76px);line
 .mvb{font-family:var(--cap);font-size:12px;letter-spacing:.1em;padding:6px 12px;border-radius:8px;border:1px solid var(--c);color:var(--c)}
 .mvb small{display:block;font-family:var(--body);letter-spacing:0;color:var(--mute);font-size:11px}
 .realcard .big{font-family:var(--cap);font-size:34px}
+.qual{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 6px;min-height:22px}
+.qual i{width:18px;height:18px;border-radius:5px;background:var(--line);display:block}
+.qual i.w{box-shadow:inset 0 -3px 0 rgba(255,255,255,.55)}
+.m .v.good{color:#2f8a63}.m .v.mid{color:#e6b04a}.m .v.bad{color:#c23a5c}
 /* rail */
 .rail{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:6px}
 .rail a{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;text-decoration:none;color:var(--mute);border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 85%,transparent);font-size:17px;transition:all .25s;position:relative}
@@ -388,15 +392,16 @@ footer .checks{margin-bottom:18px;opacity:.5;height:8px;background-size:16px 16p
       <div><div class="frame"><div class="board" id="board"></div><div class="coords"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div></div><div class="note" id="status" style="margin-top:8px">Your move.</div></div>
       <div>
         <div class="mgrid">
-          <div class="m"><div class="cap">Oracle</div><div class="v">--</div></div>
-          <div class="m"><div class="cap">Engine</div><div class="v">--</div></div>
-          <div class="m"><div class="cap">Position</div><div class="v">--</div></div>
+          <div class="m"><div class="cap">Your last move</div><div class="v" id="mYou">--</div><div class="d" id="dYou">engine cost, centipawns</div></div>
+          <div class="m"><div class="cap">Opponent's last move</div><div class="v" id="mOpp">--</div><div class="d" id="dOpp">engine cost, centipawns</div></div>
+          <div class="m"><div class="cap">Oracle</div><div class="v">--</div><div class="d">humanness, pilot positions only for now</div></div>
         </div>
+        <div class="panel" style="margin-top:12px"><div class="cap">Move quality</div><div class="qual" id="qual"><span class="note">Make a move to see it scored.</span></div><div class="legend" style="justify-content:flex-start"><span><i style="background:#2f8a63"></i>under 30</span><span><i style="background:#e6b04a"></i>30 to 150</span><span><i style="background:#c23a5c"></i>over 150</span></div><div class="note" id="eng" style="margin-top:6px">Engine loads on your first move.</div></div>
         <div class="panel" style="margin-top:12px"><div class="cap">Moves</div><div class="moves" id="moves"><span class="note">None yet.</span></div></div>
         <div class="panel" style="margin-top:12px"><div class="cap">Daily model budget</div><div class="quota"><span></span></div><div class="note">About 12 games a day on the free tier, then recorded replays.</div></div>
       </div>
     </div>
-    <p class="more rv">Pick a target rating and play a game. In the full version each AI move shows its engine score and humanness live, using the same measures as the pilot.</p>
+    <p class="more rv">Every move, yours and the opponent's, is scored by Stockfish running in your browser. Green means close to the engine's choice, red means a costly slip. In the full version the opponent is the masked model, and humanness shows too.</p>
   </div>
 </section>
 
@@ -561,23 +566,51 @@ cpr.oninput=cpU;document.getElementById('cpScn').onclick=e=>{if(e.target.dataset
  document.getElementById('pArrows').innerHTML=ar('b2','b3','#5a80d6')+ar('f1','e2','#c23a5c');
 })();
 
-/* playable board */
+/* playable board with Stockfish scoring */
 (function(){
- const st=document.getElementById('status');
+ const st=document.getElementById('status'),engEl=document.getElementById('eng');
  if(typeof Chess==='undefined'){st.textContent='Board library did not load. Check your connection.';return}
- const g=new Chess(),el=document.getElementById('board'),mv=document.getElementById('moves');
- const G={p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};let sel=null,last=[];
+ const g=new Chess(),el=document.getElementById('board'),mv=document.getElementById('moves'),qual=document.getElementById('qual');
+ const G={p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};let sel=null,last=[],gid=0,info=[];
+ /* ---- engine (stockfish.js 10, single thread, loaded as a blob worker) ---- */
+ const SF='https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js';
+ let worker=null,starting=null,chain=Promise.resolve(),cache=new Map();
+ function start(){if(starting)return starting;engEl.textContent='Loading engine...';
+  starting=fetch(SF).then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>new Promise((res,rej)=>{
+   const w=new Worker(URL.createObjectURL(new Blob([t],{type:'application/javascript'})));
+   w.onmessage=e=>{if(String(e.data).includes('uciok')){w.onmessage=null;worker=w;engEl.textContent='Engine: Stockfish 10, depth 10, in your browser.';res(w)}};
+   w.onerror=rej;w.postMessage('uci')})).catch(()=>{engEl.textContent='Engine could not load, so moves are not scored.';throw 0});
+  return starting}
+ function score(line){const m=/score (cp|mate) (-?\d+)/.exec(line);if(!m)return null;const v=+m[2];return m[1]==='cp'?v:(v>0?10000-10*v:-10000-10*v)}
+ function evalFen(fen){if(cache.has(fen))return cache.get(fen);
+  const p=chain.then(()=>start()).then(w=>new Promise(res=>{let sc=0;
+   w.onmessage=e=>{const l=String(e.data);if(l.startsWith('info')&&l.includes(' pv ')){const x=score(l);if(x!==null)sc=x}
+    else if(l.startsWith('bestmove')){w.onmessage=null;res({cp:sc,best:l.split(' ')[1]})}};
+   w.postMessage('position fen '+fen);w.postMessage('go depth 10')}));
+  chain=p.catch(()=>{});cache.set(fen,p);return p}
+ function san(fen,uci){try{const c=new Chess(fen);const m=c.move({from:uci.slice(0,2),to:uci.slice(2,4),promotion:uci[4]||'q'});return m?m.san:uci}catch(e){return uci}}
+ /* score a move played from fenBefore to fenAfter */
+ function judge(fenBefore,fenAfter,idx,side,uci){const my=gid;
+  Promise.all([evalFen(fenBefore),evalFen(fenAfter)]).then(([b,a])=>{if(my!==gid)return;
+   let loss=Math.max(0,Math.round(b.cp-(-a.cp)));if(b.best&&b.best.slice(0,4)===uci)loss=0;info[idx].loss=loss;info[idx].best=san(fenBefore,b.best);paint(side,idx)}).catch(()=>{})}
+ function paint(side,idx){const o=info[idx],cls=o.loss<30?'good':o.loss<150?'mid':'bad';
+  const v=document.getElementById(side==='w'?'mYou':'mOpp'),d=document.getElementById(side==='w'?'dYou':'dOpp');
+  v.textContent=(o.loss>=10000?'10000+':o.loss)+' cp';v.className='v '+cls;d.textContent=o.loss<10?o.san+' is the engine\'s choice':o.san+' played. Engine preferred '+o.best;rq()}
+ function rq(){qual.innerHTML=info.map(o=>`<i class="${o.side==='w'?'w':''}" title="${o.san}: ${o.loss==null?'scoring':o.loss+' cp'}" style="background:${o.loss==null?'var(--line)':o.loss<30?'#2f8a63':o.loss<150?'#e6b04a':'#c23a5c'}"></i>`).join('')||'<span class="note">Make a move to see it scored.</span>'}
+ function play(m,side){const before=g.fen();g.move(m);const after=g.fen();const san=g.history().slice(-1)[0];info.push({side,san,loss:null});rq();judge(before,after,info.length-1,side,m.from+m.to)}
+ /* ---- board ---- */
  function rec(){const h=g.history();if(!h.length){mv.innerHTML='<span class="note">None yet.</span>';return}let o='';for(let i=0;i<h.length;i+=2)o+=`<span><b>${i/2+1}.</b> ${h[i]} ${h[i+1]||''}</span>`;mv.innerHTML=o}
  function draw(){el.innerHTML='';const bd=g.board();const t=sel?g.moves({square:sel,verbose:true}).map(m=>m.to):[];
   for(let r=0;r<8;r++)for(let f=0;f<8;f++){const sq='abcdefgh'[f]+(8-r);const d=document.createElement('div');
    d.className='sq '+((r+f)%2?'d':'l')+(sel===sq?' sel':'')+(t.includes(sq)?' hint':'')+(last.includes(sq)?' last':'');
    const pc=bd[r][f];if(pc)d.innerHTML=`<span class="p ${pc.color}">${G[pc.type]}</span>`;d.onclick=()=>click(sq);el.appendChild(d)}rec()}
- function status(){if(g.in_checkmate())st.textContent=g.turn()==='w'?'Checkmate. The stand-in wins.':'Checkmate. You win.';else if(g.game_over())st.textContent='Draw.';else st.textContent=g.turn()==='w'?'Your move.'+(g.in_check()?' You are in check.':''):'Opponent thinking...'}
+ function status(){if(g.in_checkmate())st.textContent=g.turn()==='w'?'Checkmate. The stand-in wins.':'Checkmate. You win.';else if(g.game_over())st.textContent='Draw.';else st.textContent=g.turn()==='w'?'Your move.'+(g.in_check()?' You are in check.':''):'The ghost in the machine is thinking...'}
  function click(sq){if(g.turn()!=='w'||g.game_over())return;const pc=g.get(sq);
-  if(sel&&sel!==sq){const m=g.move({from:sel,to:sq,promotion:'q'});if(m){last=[m.from,m.to];sel=null;draw();status();setTimeout(reply,450);return}}
+  if(sel&&sel!==sq){const ok=g.moves({square:sel,verbose:true}).find(m=>m.to===sq);if(ok){const m={from:sel,to:sq,promotion:'q'};play(m,'w');last=[sel,sq];sel=null;draw();status();setTimeout(reply,450);return}}
   sel=(pc&&pc.color==='w')?sq:null;draw()}
- function reply(){if(g.game_over()){status();return}const ms=g.moves({verbose:true});const m=ms[Math.floor(Math.random()*ms.length)];g.move(m);last=[m.from,m.to];draw();status()}
- document.getElementById('newGame').onclick=()=>{g.reset();sel=null;last=[];draw();status()};
+ function reply(){if(g.game_over()){status();return}const ms=g.moves({verbose:true});const m=ms[Math.floor(Math.random()*ms.length)];play({from:m.from,to:m.to,promotion:m.promotion||'q'},'b');last=[m.from,m.to];draw();status()}
+ function reset(){gid++;g.reset();sel=null;last=[];info=[];['mYou','mOpp'].forEach(i=>{const v=document.getElementById(i);v.textContent='--';v.className='v'});rq();draw();status()}
+ document.getElementById('newGame').onclick=reset;
  const rt=document.getElementById('rating');rt.onclick=e=>{if(e.target.id==='newGame'||e.target.tagName!=='BUTTON')return;[...rt.querySelectorAll('.btn')].forEach(b=>{if(b.id!=='newGame')b.classList.remove('on')});e.target.classList.add('on')};
  draw();status()})();
 </script>
