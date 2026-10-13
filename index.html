@@ -6,7 +6,15 @@
 <title>Sleight of Mind</title>
 <meta name="description" content="An AI capability-elicitation eval, starting with chess. Can a language model play down to a chosen skill level convincingly?">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312090d'/%3E%3Cpath d='M10 46L7 20l14 10 11-18 11 18 14-10-3 26z' fill='%23d9b25a'/%3E%3Crect x='10' y='48' width='44' height='6' rx='2' fill='%23d9b25a'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yashrao10.github.io/sleight-of-mind/">
 <meta property="og:title" content="Sleight of Mind">
+<meta property="og:image" content="https://yashrao10.github.io/sleight-of-mind/og-card.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sleight of Mind">
+<meta name="twitter:image" content="https://yashrao10.github.io/sleight-of-mind/og-card.png?v=1">
 <meta property="og:description" content="An AI capability-elicitation eval, starting with chess. Can a language model play down to a chosen skill level convincingly?">
 <meta name="theme-color" content="#12090d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -185,7 +193,7 @@ h2.h{font-family:var(--disp);font-weight:700;font-size:clamp(38px,7vw,76px);line
 .playgrid{display:grid;grid-template-columns:minmax(280px,440px) 1fr;gap:22px;align-items:start;text-align:left}
 @media(max-width:760px){.playgrid{grid-template-columns:1fr}}
 .frame{padding:12px;border-radius:12px;background:linear-gradient(135deg,#5a1a2b,#2a0f18);border:1px solid var(--gold3);box-shadow:0 14px 40px rgba(0,0,0,.4)}
-.board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border-radius:4px;overflow:hidden;user-select:none}
+.board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);aspect-ratio:1;border-radius:4px;overflow:hidden;user-select:none}
 .sq{display:flex;align-items:center;justify-content:center;font-size:clamp(22px,5.6vw,44px);cursor:pointer;position:relative;line-height:1}
 .sq.l{background:var(--sqL)}.sq.d{background:var(--sqD)}
 .sq .p.w{color:#fffdf5;text-shadow:0 0 3px #000,0 1px 2px #000}.sq .p.b{color:#1a0d12}
