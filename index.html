@@ -77,7 +77,7 @@ h2.h{font-family:var(--disp);font-weight:700;font-size:clamp(38px,7vw,76px);line
 .scene>.inner{position:relative;z-index:1}
 .wreath{position:absolute;inset:-18px;width:calc(100% + 36px);height:calc(100% + 36px);pointer-events:none;opacity:.85}
 .wreath ellipse{fill:var(--gold);opacity:.8}
-.num{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:none}
+.num{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:none;text-wrap:balance}
 .num::before,.num::after{content:"\2756";color:var(--gold3);margin:0 10px;font-size:10px}
 .mini{position:relative;width:100%;max-width:400px;margin:0 auto}
 .mini .board{pointer-events:none}
@@ -372,7 +372,7 @@ footer .checks{margin-bottom:18px;opacity:.5;height:8px;background-size:16px 16p
     <p class="say rv d2">Taller means weaker play. The queen's tower is the tallest. <span class="badge">PRELIMINARY</span></p>
     <div class="score rv d3">
       <div class="panel"><div class="cap" style="margin-bottom:10px">Average centipawn loss</div><div class="podium" id="podium"></div><div class="plab" id="plab"></div></div>
-      <div class="panel"><div class="cap">Three measures per rank</div><svg class="radar" id="radar" viewBox="0 0 420 290" style="width:100%;height:auto"></svg><div class="legend" id="radarLeg"></div></div>
+      <div class="panel"><div class="cap">Three measures per rank</div><svg class="radar" id="radar" viewBox="-20 0 460 290" style="width:100%;height:auto"></svg><div class="legend" id="radarLeg"></div></div>
     </div>
     <p class="more rv">The queen rank has the <b>largest</b> loss, the opposite of what a working dial would give. The radar shows the three measures barely move between ranks. With 101 positions and one model, treat this as a first look.</p>
   </div>
