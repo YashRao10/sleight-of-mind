@@ -636,8 +636,10 @@ cpr.oninput=cpU;document.getElementById('cpScn').onclick=e=>{if(e.target.dataset
     else if(l.startsWith('bestmove')){w.onmessage=null;res({cp:sc[1]!==undefined?sc[1]:0,best:l.split(' ')[1],gap:sc[2]!==undefined&&sc[1]!==undefined?sc[1]-sc[2]:null})}};
    w.postMessage('position fen '+fen);w.postMessage('go depth 10')}));
   chain=p.catch(()=>{});cache.set(fen,p);return p}
- /* ---- opponent: a second Stockfish held back by Skill Level and depth (approximate, not calibrated) ---- */
- const LV=[{skill:0,depth:1},{skill:3,depth:4},{skill:8,depth:8}];
+ /* ---- opponent: a second Stockfish held back by Skill Level and depth (approximate, not calibrated).
+    Measured 10/15 on 10 positions vs a depth-12 reference, avg centipawn loss: 0/1 = 124, 8/6 = 67, 14/10 = 40.
+    Skill 0 to 5 are indistinguishable in this build, so the easy level is the weakest setting available. ---- */
+ const LV=[{skill:0,depth:1},{skill:8,depth:6},{skill:14,depth:10}];
  let oppW=null,oppStarting=null;
  function oppStart(){if(oppStarting)return oppStarting;
   oppStarting=fetch(SF).then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>new Promise((res,rej)=>{
