@@ -262,7 +262,7 @@ footer .checks{margin-bottom:18px;opacity:.5;height:8px;background-size:16px 16p
     <div class="num">An AI capability-elicitation eval</div>
     <h1 class="gold">Sleight of Mind</h1>
     <p class="more">Language models can be told to play down to a chosen skill level. This project tests whether they can do it <b>convincingly</b>. Chess is the testbed because every move can be graded exactly.</p>
-    <span class="badge">PILOT &middot; 117 POSITIONS &middot; ONE MODEL</span>
+    <span class="badge">117 POSITIONS &middot; ONE MODEL</span>
     <div class="cue">SCROLL</div>
   </div>
   <div class="checks"></div>
@@ -337,7 +337,7 @@ footer .checks{margin-bottom:18px;opacity:.5;height:8px;background-size:16px 16p
     <div class="opts rv d2" id="opts"></div>
     <div class="slip rv d3">
       <div class="mini"><div class="frame"><div class="board" id="miniBoard"></div></div><svg class="arrows" id="arrows" viewBox="0 0 8 8" style="inset:12px;width:calc(100% - 24px);height:calc(100% - 24px)"></svg></div>
-      <div><h3 id="slipH"></h3><div class="tags" id="slipT"></div><p class="more" style="margin:0;text-align:left" id="slipP"></p><p class="note" style="margin-top:12px">ILLUSTRATION: a classic teaching position, not from the pilot data.</p></div>
+      <div><h3 id="slipH"></h3><div class="tags" id="slipT"></div><p class="more" style="margin:0;text-align:left" id="slipP"></p><p class="note" style="margin-top:12px">ILLUSTRATION: a classic teaching position, not from the study data.</p></div>
     </div>
     <p class="more rv">This is the heart of the eval. A weaker rating should mean <b>human-style</b> mistakes, like missing a tactic that looks natural to miss. A model that blunders in odd, pointless ways is not sandbagging well, it is just noisy, and Maia-2 is built to tell the two apart.</p>
   </div>
@@ -419,7 +419,7 @@ footer .checks{margin-bottom:18px;opacity:.5;height:8px;background-size:16px 16p
           <div class="m"><div class="cap">Your last move</div><div class="v" id="mYou">--</div><div class="d" id="dYou">engine cost, centipawns</div></div>
           <div class="m"><div class="cap">Opponent's last move</div><div class="v" id="mOpp">--</div><div class="d" id="dOpp">engine cost, centipawns</div></div>
           <div class="m"><div class="cap">Position now</div><div class="v" id="mPos">--</div><div class="d" id="dPos">tactic if best beats second by 150 cp</div></div>
-          <div class="m"><div class="cap">Oracle</div><div class="v">--</div><div class="d">humanness, pilot positions only for now</div></div>
+          <div class="m"><div class="cap">Oracle</div><div class="v">--</div><div class="d">humanness, not scored live in Play yet</div></div>
         </div>
         <div class="panel" style="margin-top:12px"><div class="cap">Move quality</div><div class="qual" id="qual"><span class="note">Make a move to see it scored.</span></div><div class="legend" style="justify-content:flex-start"><span><i style="background:#2f8a63"></i>under 30</span><span><i style="background:#e6b04a"></i>30 to 150</span><span><i style="background:#c23a5c"></i>over 150</span></div><div class="note" id="eng" style="margin-top:6px">Engine loads on your first move.</div></div>
         <div class="panel" style="margin-top:12px"><div class="cap">Moves</div><div class="moves" id="moves"><span class="note">None yet.</span></div></div>
